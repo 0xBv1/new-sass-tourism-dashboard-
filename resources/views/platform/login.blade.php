@@ -6,7 +6,7 @@
     <h1>دخول Perfect Solution</h1>
     <p class="muted">What you want is here. من هنا تدير شركات السياحة: الموقع، الحسابات، والنطاق.</p>
 
-    <form method="POST" action="{{ route('platform.login.store') }}">
+    <form method="POST" action="/platform/login">
         @csrf
         <label for="email">البريد</label>
         <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus>

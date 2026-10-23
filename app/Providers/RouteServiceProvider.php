@@ -43,6 +43,12 @@ class RouteServiceProvider extends ServiceProvider
                 [$primary]
             ))));
 
+            $requestHost = $this->app->runningInConsole() ? '' : (string) request()->getHost();
+            if ($requestHost !== '' && in_array($requestHost, $domains, true)) {
+                $domains = array_values(array_diff($domains, [$requestHost]));
+                $domains[] = $requestHost;
+            }
+
             foreach ($domains as $domain) {
                 Route::middleware('web')
                     ->domain($domain)

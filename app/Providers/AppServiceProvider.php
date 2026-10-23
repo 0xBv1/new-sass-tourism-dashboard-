@@ -13,6 +13,7 @@ use App\Models\Tour;
 use App\Observers\CategoryObserver;
 use App\Observers\TourObserver;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Notifications\ChannelManager;
 use App\Services\Translation\Google\FreeTranslator;
@@ -55,6 +56,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->useRequestHostForUrls();
+
         // Check if application is installed before accessing database
         $isInstalled = file_exists(storage_path('app/installed'));
         
@@ -75,6 +78,34 @@ class AppServiceProvider extends ServiceProvider
         // File macros don't require database
         File::macro('isEmptyDir', function ($path) {
             return count(glob("$path/*")) === 0;
+        });
+    }
+
+    /**
+     * Keep generated links on the host the visitor opened.
+     * Route domains still include 127.0.0.1 for local use, and that host was winning route().
+     */
+    protected function useRequestHostForUrls(): void
+    {
+        if ($this->app->runningInConsole()) {
+            return;
+        }
+
+        $host = request()->getHost();
+
+        if ($host === '') {
+            return;
+        }
+
+        URL::forceRootUrl(request()->getSchemeAndHttpHost());
+        URL::formatHostUsing(function (string $root) use ($host) {
+            $rootHost = parse_url($root, PHP_URL_HOST);
+
+            if (! in_array($rootHost, ['127.0.0.1', 'localhost'], true) || in_array($host, ['127.0.0.1', 'localhost'], true)) {
+                return $root;
+            }
+
+            return request()->getScheme().'://'.$host;
         });
 //        Str::macro('htmlEntityDecode', fn($value) => Str::of(html_entity_decode($value)));
 //        Stringable::macro('htmlEntityDecode', fn() => new Stringable(html_entity_decode($this->value)));
