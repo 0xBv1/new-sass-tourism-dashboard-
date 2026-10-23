@@ -647,7 +647,7 @@ class InstallController extends Controller
     public function complete()
     {
         if (!$this->installService->isInstalled()) {
-            return redirect()->route('install.index');
+            return redirect('/install');
         }
 
         return view('install.complete');

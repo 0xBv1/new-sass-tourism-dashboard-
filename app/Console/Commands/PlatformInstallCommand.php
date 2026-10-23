@@ -39,6 +39,7 @@ class PlatformInstallCommand extends Command
         $this->ensurePassportKeys();
         $this->ensurePlatformAdmin();
         TenantStorage::detachSharedSymlink();
+        app(\App\Services\InstallService::class)->markAsInstalled();
 
         $this->info('Platform is ready at http://'.config('tenancy.primary_central_domain').'/platform/login');
 

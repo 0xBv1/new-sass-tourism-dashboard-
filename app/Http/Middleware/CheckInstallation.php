@@ -32,11 +32,11 @@ class CheckInstallation
         try {
             // If not installed, redirect to installation
             if (!$this->installService->isInstalled()) {
-                return redirect()->route('install.index');
+                return redirect('/install');
             }
         } catch (\Exception $e) {
             // If there's any error (like missing .env or database), redirect to install
-            return redirect()->route('install.index');
+            return redirect('/install');
         }
 
         return $next($request);

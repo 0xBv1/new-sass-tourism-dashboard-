@@ -36,7 +36,7 @@ Route::prefix('install')->name('install.')->group(function () {
 Route::get('/', function () {
     $installService = app(\App\Services\InstallService::class);
     if (! $installService->isInstalled()) {
-        return redirect()->route('install.index');
+        return redirect('/install');
     }
 
     return redirect('/platform/login');
