@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Platform\CompanyRequest;
 use App\Models\Tenant;
 use App\Services\Tenancy\CompanyInsights;
+use App\Services\Tenancy\CompanyLifecycle;
 use App\Services\Tenancy\CompanyProvisioner;
 use App\Services\Tenancy\TenantUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class CompanyController extends Controller
@@ -49,7 +52,8 @@ class CompanyController extends Controller
             'ready' => $ready,
             'baseDomain' => TenantUrl::baseDomain(),
             'profile' => app(CompanyInsights::class)->forCompany($tenant, $ready, request()->boolean('refresh')),
-            'loginUrl' => $ready ? TenantUrl::urlFor($tenant->id).'/login' : null,
+            'loginUrl' => $ready && ! $tenant->isOpeningSoon() ? TenantUrl::urlFor($tenant->id).'/login' : null,
+            'opensAt' => $tenant->isOpeningSoon() ? $tenant->opensAt()->getTimestamp() : null,
         ]);
     }
 
@@ -109,13 +113,52 @@ class CompanyController extends Controller
         return response()->json(app(CompanyProvisioner::class)->advance($tenant));
     }
 
+    public function suspend(Tenant $tenant, CompanyLifecycle $lifecycle): RedirectResponse
+    {
+        $lifecycle->suspend($tenant);
+
+        return back()->with('status', 'تم إيقاف '.$tenant->company_name.'. الموقع اتقفل والبيانات لسه محفوظة.');
+    }
+
+    public function resume(Tenant $tenant, CompanyLifecycle $lifecycle): RedirectResponse
+    {
+        $lifecycle->resume($tenant);
+
+        return back()->with('status', 'تم تشغيل '.$tenant->company_name.' من جديد.');
+    }
+
+    public function destroy(Request $request, Tenant $tenant, CompanyLifecycle $lifecycle): RedirectResponse
+    {
+        $request->validate([
+            'confirmation' => ['required', Rule::in([$tenant->id])],
+        ], [
+            'confirmation.in' => 'اكتب معرف الشركة كما هو للتأكيد.',
+        ]);
+
+        $name = $tenant->company_name;
+
+        try {
+            $lifecycle->delete($tenant);
+        } catch (\Throwable $exception) {
+            Log::error('Company deletion failed', [
+                'tenant' => $tenant->id,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return back()->withErrors(['confirmation' => 'تعذر حذف الشركة: '.$exception->getMessage()]);
+        }
+
+        return redirect()->route('platform.companies.index')->with('status', 'تم حذف '.$name.' وقاعدتها وسب دومينها.');
+    }
+
     protected function summary($companies, $needsProvision, $profiles): array
     {
         $usage = collect($profiles)->pluck('usage')->filter(fn ($row) => is_array($row) && empty($row['error']));
 
         return [
             'companies' => $companies->count(),
-            'ready' => $needsProvision->filter(fn ($needs) => ! $needs)->count(),
+            'ready' => $companies->filter(fn (Tenant $company) => ! $company->isSuspended() && ! $needsProvision[$company->id])->count(),
+            'suspended' => $companies->filter(fn (Tenant $company) => $company->isSuspended())->count(),
             'setup' => $companies->filter(fn (Tenant $company) => $company->provision_status !== 'failed' && $needsProvision[$company->id])->count(),
             'attention' => $companies->where('provision_status', 'failed')->count(),
             'tours' => (int) $usage->sum('tours'),

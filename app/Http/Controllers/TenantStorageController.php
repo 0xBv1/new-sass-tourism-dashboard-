@@ -11,7 +11,10 @@ class TenantStorageController extends Controller
     {
         $this->abortIf($path === null || $path === '', 404);
 
-        $allowedRoot = realpath(storage_path('app/public'));
+        $root = in_array($request->getHost(), config('tenancy.central_domains', []), true)
+            ? base_path('storage/app/public')
+            : storage_path('app/public');
+        $allowedRoot = realpath($root);
         $this->abortIf($allowedRoot === false, 404);
 
         $attemptedPath = realpath($allowedRoot.DIRECTORY_SEPARATOR.$path);

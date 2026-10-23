@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
@@ -24,5 +25,24 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function databaseName(): string
     {
         return (string) $this->database()->getName();
+    }
+
+    public function isSuspended(): bool
+    {
+        return filled($this->suspended_at);
+    }
+
+    public function opensAt(): ?Carbon
+    {
+        if (blank($this->available_at)) {
+            return null;
+        }
+
+        return Carbon::parse($this->available_at);
+    }
+
+    public function isOpeningSoon(): bool
+    {
+        return (bool) $this->opensAt()?->isFuture();
     }
 }

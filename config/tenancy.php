@@ -15,6 +15,15 @@ return [
     'base_domain' => env('TENANCY_BASE_DOMAIN', 'localhost'),
     'app_url' => env('APP_URL', 'http://localhost'),
 
+    'cpanel' => [
+        'endpoint' => env('CPANEL_API_URL', 'https://127.0.0.1:2083'),
+        'user' => env('CPANEL_USER', ''),
+        'token' => env('CPANEL_API_TOKEN', ''),
+        'root_domain' => env('CPANEL_ROOT_DOMAIN', env('TENANCY_BASE_DOMAIN', '')),
+        'docroot' => env('CPANEL_DOCROOT', 'public_html'),
+        'db_user' => env('CPANEL_DB_USER', env('DB_USERNAME', '')),
+    ],
+
     'central_domains' => array_values(array_unique(array_filter([
         $centralDomain,
         '127.0.0.1',

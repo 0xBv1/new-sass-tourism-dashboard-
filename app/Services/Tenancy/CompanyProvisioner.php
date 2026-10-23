@@ -23,7 +23,7 @@ class CompanyProvisioner
             'database' => 'إنشاء قاعدة البيانات',
             'migrate' => 'إنشاء الجداول',
             'setup' => 'حساب المدير والإعدادات والملفات',
-            'hosts' => 'تسجيل السب دومين',
+            'hosts' => 'إنشاء السب دومين',
         ];
     }
 
@@ -80,6 +80,7 @@ class CompanyProvisioner
             'error' => $tenant->provision_error,
             'hosts' => $tenant->provision_hosts,
             'login_url' => $setupDone ? TenantUrl::urlFor($tenant->id).'/login' : null,
+            'opens_at' => $tenant->opensAt()?->getTimestamp(),
             'steps' => $steps,
         ];
     }
@@ -203,6 +204,7 @@ class CompanyProvisioner
 
         if ($tenant->provision_status === 'ready') {
             $tenant->defer_provisioning = false;
+            $this->scheduleOpening($tenant);
         }
 
         $tenant->save();
@@ -214,12 +216,27 @@ class CompanyProvisioner
         $tenant->provision_done = array_keys($this->steps());
         $tenant->provision_error = null;
         $tenant->defer_provisioning = false;
+        $this->scheduleOpening($tenant);
         $tenant->save();
+    }
+
+    protected function scheduleOpening(Tenant $tenant): void
+    {
+        if (filled($tenant->available_at)) {
+            return;
+        }
+
+        $tenant->available_at = now()->addMinute()->toDateTimeString();
     }
 
     protected function ensureDomain(Tenant $tenant): void
     {
         $host = TenantUrl::hostFor($tenant->id);
+        $cpanel = app(CpanelClient::class);
+
+        if ($cpanel->enabled()) {
+            $cpanel->ensureSubdomain($host);
+        }
 
         if ($tenant->domains()->where('domain', $host)->doesntExist()) {
             $tenant->createDomain($host);
@@ -233,6 +250,18 @@ class CompanyProvisioner
         if ($tenant->databaseName() !== $expected) {
             $tenant->setInternal('db_name', $expected);
             $tenant->save();
+        }
+
+        $cpanel = app(CpanelClient::class);
+
+        if ($cpanel->enabled()) {
+            $cpanel->ensureDatabase($expected);
+
+            if (! $this->databaseExists($tenant)) {
+                throw new RuntimeException('اتعملت قاعدة '.$expected.' في الاستضافة، لكن التطبيق لسه مش قادر يفتحها.');
+            }
+
+            return;
         }
 
         if ($this->databaseExists($tenant)) {

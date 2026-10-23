@@ -4,7 +4,7 @@
     $usage = $profile['usage'] ?? null;
     $hasUsage = is_array($usage) && empty($usage['error']);
     $host = $company->domains->first()?->domain;
-    $status = $ready ? 'ready' : ($company->provision_status ?: 'pending');
+    $status = $company->isSuspended() ? 'suspended' : ($ready ? 'ready' : ($company->provision_status ?: 'pending'));
 @endphp
 
 @section('title', 'Perfect Solution | '.$company->company_name)
@@ -12,7 +12,14 @@
 @section('lead', ($host ?: $company->id.'.'.$baseDomain).' — What you want is here')
 
 @section('actions')
-    @if ($loginUrl)
+    @if ($company->isSuspended())
+        <form method="post" action="{{ route('platform.companies.resume', $company) }}">
+            @csrf
+            <button class="button" type="submit">تشغيل الشركة</button>
+        </form>
+    @elseif ($opensAt)
+        <span class="button ghost" id="open-wait" data-opens-at="{{ $opensAt }}">هتفتح بعد دقيقة</span>
+    @elseif ($loginUrl)
         <a class="button" href="{{ $loginUrl }}">فتح الداشبورد</a>
     @else
         <a class="button" href="{{ route('platform.companies.provision', $company) }}">متابعة الإنشاء</a>
@@ -21,11 +28,17 @@
 @endsection
 
 @section('content')
+    @if (session('status'))
+        <div class="status">{{ session('status') }}</div>
+    @endif
+
     <div class="grid-2">
         <section class="card">
             <div class="actions">
                 <h2>بيانات الشركة</h2>
-                @if ($status === 'ready')
+                @if ($status === 'suspended')
+                    <span class="pill failed">موقوفة</span>
+                @elseif ($status === 'ready')
                     <span class="pill ready">جاهزة</span>
                 @elseif ($status === 'failed')
                     <span class="pill failed">تحتاج متابعة</span>
@@ -115,4 +128,52 @@
             @endif
         @endif
     </section>
+
+    <section class="card" style="margin-top:14px">
+        <h2>إيقاف أو حذف</h2>
+        @if ($company->isSuspended())
+            <p class="muted" style="margin-top:8px">الموقع متوقف عن الزوار. البيانات والسب دومين لسه موجودين.</p>
+        @else
+            <p class="muted" style="margin-top:8px">الإيقاف يقفل الموقع مؤقتاً من غير ما يمسح البيانات.</p>
+            <form method="post" action="{{ route('platform.companies.suspend', $company) }}" style="margin-top:12px" onsubmit="return confirm('إيقاف الشركة؟ الموقع هيتقفل والبيانات هتفضل محفوظة.')">
+                @csrf
+                <button class="button ghost" type="submit">إيقاف الشركة</button>
+            </form>
+        @endif
+
+        <p class="muted" style="margin-top:18px">الحذف نهائي: قاعدة البيانات والسب دومين وملفات الشركة.</p>
+        <form method="post" action="{{ route('platform.companies.destroy', $company) }}" onsubmit="return confirm('حذف الشركة نهائياً؟ مش هتقدر ترجعها.')">
+            @csrf
+            @method('DELETE')
+            <div class="confirm-row">
+                <div>
+                    <label for="confirmation">اكتب {{ $company->id }} للتأكيد</label>
+                    <input id="confirmation" name="confirmation" autocomplete="off" required>
+                    @error('confirmation')
+                        <p class="error">{{ $message }}</p>
+                    @enderror
+                </div>
+                <button class="button danger" type="submit">حذف الشركة</button>
+            </div>
+        </form>
+    </section>
 @endsection
+
+@push('scripts')
+    <script>
+        const wait = document.getElementById('open-wait');
+        if (wait) {
+            const opensAt = Number(wait.dataset.opensAt);
+            const timer = setInterval(() => {
+                const left = Math.max(0, opensAt - Math.floor(Date.now() / 1000));
+                const minutes = Math.floor(left / 60);
+                const seconds = String(left % 60).padStart(2, '0');
+                wait.textContent = 'هتفتح بعد ' + minutes + ':' + seconds;
+                if (left === 0) {
+                    clearInterval(timer);
+                    window.location.reload();
+                }
+            }, 1000);
+        }
+    </script>
+@endpush

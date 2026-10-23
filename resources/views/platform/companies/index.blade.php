@@ -36,6 +36,7 @@
                     <button class="chip" type="button" data-filter="ready">جاهزة</button>
                     <button class="chip" type="button" data-filter="pending">قيد الإنشاء</button>
                     <button class="chip" type="button" data-filter="failed">تحتاج متابعة</button>
+                    <button class="chip" type="button" data-filter="suspended">موقوفة</button>
                 </div>
             </div>
             <div class="table-wrap">
@@ -60,8 +61,8 @@
                             $profile = $profiles[$company->id];
                             $usage = $profile['usage'] ?? null;
                             $host = $company->domains->first()?->domain;
-                            $status = $company->provision_status ?: 'pending';
-                            if (! empty($needsProvision[$company->id]) && $status === 'ready') {
+                            $status = $company->isSuspended() ? 'suspended' : ($company->provision_status ?: 'pending');
+                            if ($status !== 'suspended' && ! empty($needsProvision[$company->id]) && $status === 'ready') {
                                 $status = 'pending';
                             }
                             $search = strtolower(implode(' ', array_filter([
@@ -92,7 +93,9 @@
                             <td class="num">{{ is_array($usage) && empty($usage['error']) ? number_format($usage['hotels']) : '—' }}</td>
                             <td class="num">{{ is_array($usage) && empty($usage['error']) ? number_format($usage['revenue'], 2) : '—' }}</td>
                             <td>
-                                @if ($status === 'ready')
+                                @if ($status === 'suspended')
+                                    <span class="pill failed">موقوفة</span>
+                                @elseif ($status === 'ready')
                                     <span class="pill ready">جاهزة</span>
                                 @elseif ($status === 'failed')
                                     <span class="pill failed">تحتاج متابعة</span>
@@ -103,7 +106,11 @@
                             <td>
                                 <div class="row-actions">
                                     <a href="{{ route('platform.companies.show', $company) }}">التفاصيل</a>
-                                    @if (! empty($needsProvision[$company->id]))
+                                    @if ($status === 'suspended')
+                                        <a href="{{ route('platform.companies.show', $company) }}">تشغيل</a>
+                                    @elseif ($company->isOpeningSoon())
+                                        <span class="sub">هتفتح بعد دقيقة</span>
+                                    @elseif (! empty($needsProvision[$company->id]))
                                         <a href="{{ route('platform.companies.provision', $company) }}">متابعة</a>
                                     @elseif ($host)
                                         <a href="{{ \App\Services\Tenancy\TenantUrl::urlFor($company->id) }}/login">الداشبورد</a>

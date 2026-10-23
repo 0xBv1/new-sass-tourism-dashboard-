@@ -48,6 +48,9 @@
         .button, button { display: inline-flex; align-items: center; justify-content: center; background: var(--teal); color: #fff; border: 0; border-radius: 12px; padding: 10px 16px; text-decoration: none; cursor: pointer; font: inherit; }
         .button.ghost, button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
         .button.light { background: #fff; color: var(--navy); }
+        .button.danger, button.danger { background: var(--danger); color: #fff; }
+        .confirm-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-top: 12px; }
+        .confirm-row input { width: min(280px, 100%); }
         .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
         .stat, .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); }
         .stat { padding: 16px 18px; }

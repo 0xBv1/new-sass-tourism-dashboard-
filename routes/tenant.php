@@ -2,14 +2,23 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TenantStorageController;
+use App\Http\Middleware\InitializeTenancyUnlessCentral;
+use App\Http\Middleware\PreventSuspendedTenant;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+
+Route::middleware(['web', InitializeTenancyUnlessCentral::class])->group(function () {
+    Route::get('/storage/{path}', [TenantStorageController::class, 'show'])
+        ->where('path', '.*')
+        ->name('tenant.storage');
+});
 
 Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
+    PreventSuspendedTenant::class,
 ])->group(function () {
     require __DIR__.'/auth.php';
     require __DIR__.'/admin.php';
@@ -17,10 +26,6 @@ Route::middleware([
     Route::get('/', function () {
         return redirect()->route('login');
     });
-
-    Route::get('/storage/{path}', [TenantStorageController::class, 'show'])
-        ->where('path', '.*')
-        ->name('tenant.storage');
 
     Route::get('/dashboard', function () {
         return view('dashboard.home.index');

@@ -51,10 +51,17 @@
             if (state.status === 'ready') {
                 doneEl.hidden = false;
                 doneEl.textContent = '';
-                const link = document.createElement('a');
-                link.href = state.login_url;
-                link.textContent = 'فتح داشبورد الشركة';
-                doneEl.append('تم إنشاء الشركة. ', link);
+                const wait = Math.max(0, (state.opens_at || 0) - Math.floor(Date.now() / 1000));
+                if (wait > 0) {
+                    const minutes = Math.floor(wait / 60);
+                    const seconds = String(wait % 60).padStart(2, '0');
+                    doneEl.textContent = 'تم إنشاء الشركة. السب دومين بيتسجل، تقدر تفتحها بعد ' + minutes + ':' + seconds;
+                } else {
+                    const link = document.createElement('a');
+                    link.href = state.login_url;
+                    link.textContent = 'فتح داشبورد الشركة';
+                    doneEl.append('تم إنشاء الشركة. ', link);
+                }
             } else if (state.login_url && state.status === 'failed') {
                 doneEl.hidden = false;
                 doneEl.textContent = '';
@@ -122,6 +129,13 @@
         render();
         if (state.status === 'pending') {
             advance();
+        } else if (state.status === 'ready' && state.opens_at && state.opens_at * 1000 > Date.now()) {
+            const timer = setInterval(() => {
+                render();
+                if (!state.opens_at || state.opens_at * 1000 <= Date.now()) {
+                    clearInterval(timer);
+                }
+            }, 1000);
         }
     </script>
 @endpush

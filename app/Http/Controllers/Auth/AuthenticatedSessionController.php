@@ -39,11 +39,14 @@ class AuthenticatedSessionController extends Controller
 
         if ($guard == 'client_web') {
 
-            setcookie(
-                'token',
-                auth('client_web')->user()->createToken('api')->accessToken,
-                now()->addHours(2)->unix()
-            );
+            setcookie('token', auth('client_web')->user()->createToken('api')->accessToken, [
+                'expires' => now()->addHours(2)->unix(),
+                'path' => '/',
+                'secure' => $request->isSecure(),
+                'httponly' => false,
+                'samesite' => 'Lax',
+            ]);
+
             return redirect()->intended('/api/documentation');
         }
 

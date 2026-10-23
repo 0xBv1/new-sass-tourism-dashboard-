@@ -52,6 +52,9 @@ Route::middleware('auth:platform')->prefix('platform')->name('platform.')->group
     Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
     Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
     Route::post('/companies', [CompanyController::class, 'store'])->name('companies.store');
+    Route::post('/companies/{tenant}/suspend', [CompanyController::class, 'suspend'])->name('companies.suspend');
+    Route::post('/companies/{tenant}/resume', [CompanyController::class, 'resume'])->name('companies.resume');
+    Route::delete('/companies/{tenant}', [CompanyController::class, 'destroy'])->name('companies.destroy');
     Route::get('/companies/{tenant}', [CompanyController::class, 'show'])->name('companies.show');
     Route::get('/companies/{tenant}/provision', [CompanyController::class, 'provision'])->name('companies.provision');
     Route::post('/companies/{tenant}/provision', [CompanyController::class, 'provisionStep'])->name('companies.provision.step');
