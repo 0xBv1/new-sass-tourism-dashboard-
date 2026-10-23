@@ -1,0 +1,31 @@
+.select2-container {
+    width: 100% !important;
+}
+.dataTable {
+    width: 100% !important;
+}
+.auto-translate-d {
+    position: fixed;
+    bottom: 10%;
+    right: 2%;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    font-size: 24px;
+}
+.input-group select.dropdown-toggle{
+    background: var(--theme-color);
+    border: unset;
+    padding-left: 10px;
+    font-weight: bold;
+}
+.light .input-group select.dropdown-toggle {
+    color: #fff;
+}
+#data-table td:last-of-type i{
+    font-size: 18px !important;
+}

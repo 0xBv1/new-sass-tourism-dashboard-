@@ -1,0 +1,282 @@
+/**
+ * Easy Editor - Custom Rich Text Editor Styles
+ * Dashboard color scheme integration
+ */
+
+/* Dashboard Color Variables */
+:root {
+    --bs-primary: #0d6efd;
+    --bs-secondary: #6c757d;
+    --bs-success: #198754;
+    --bs-info: #0dcaf0;
+    --bs-warning: #ffc107;
+    --bs-danger: #dc3545;
+    --bs-light: #f8f9fa;
+    --bs-dark: #212529;
+    --bs-white: #fff;
+    --bs-gray: #6c757d;
+    --bs-gray-dark: #343a40;
+}
+
+/* Easy Editor Container */
+.easy-editor-container {
+    background: var(--bs-white);
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.easy-editor-container .ql-container {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--bs-dark);
+    min-height: 500px;
+    background: var(--bs-white);
+}
+
+.easy-editor-container .ql-editor {
+    min-height: 500px;
+    padding: 1rem;
+}
+
+.easy-editor-container .ql-editor.ql-blank::before {
+    color: var(--bs-gray);
+    font-style: normal;
+}
+
+/* Toolbar Styling - Dashboard Colors */
+.easy-editor-container .ql-toolbar {
+    background: var(--bs-light);
+    border-bottom: 1px solid #ced4da;
+    padding: 0.5rem;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+}
+
+.easy-editor-container .ql-toolbar .ql-stroke {
+    stroke: var(--bs-dark);
+}
+
+.easy-editor-container .ql-toolbar .ql-fill {
+    fill: var(--bs-dark);
+}
+
+.easy-editor-container .ql-toolbar button {
+    color: var(--bs-dark);
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.5rem;
+    margin: 0 0.125rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.easy-editor-container .ql-toolbar button:hover,
+.easy-editor-container .ql-toolbar button.ql-active {
+    background: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+.easy-editor-container .ql-toolbar button:hover .ql-stroke,
+.easy-editor-container .ql-toolbar button.ql-active .ql-stroke {
+    stroke: var(--bs-white);
+}
+
+.easy-editor-container .ql-toolbar button:hover .ql-fill,
+.easy-editor-container .ql-toolbar button.ql-active .ql-fill {
+    fill: var(--bs-white);
+}
+
+.easy-editor-container .ql-toolbar .ql-picker {
+    color: var(--bs-dark);
+    border-radius: 0.25rem;
+}
+
+.easy-editor-container .ql-toolbar .ql-picker:hover {
+    background: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+.easy-editor-container .ql-toolbar .ql-picker.ql-expanded {
+    background: var(--bs-white);
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.easy-editor-container .ql-toolbar .ql-picker-options {
+    background: var(--bs-white);
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    padding: 0.5rem;
+}
+
+.easy-editor-container .ql-toolbar .ql-picker-item {
+    color: var(--bs-dark);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.easy-editor-container .ql-toolbar .ql-picker-item:hover {
+    background: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+/* Editor Content Styling */
+.easy-editor-container .ql-editor {
+    color: var(--bs-dark);
+}
+
+.easy-editor-container .ql-editor h1,
+.easy-editor-container .ql-editor h2,
+.easy-editor-container .ql-editor h3,
+.easy-editor-container .ql-editor h4,
+.easy-editor-container .ql-editor h5,
+.easy-editor-container .ql-editor h6 {
+    color: var(--bs-dark);
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.easy-editor-container .ql-editor p {
+    margin-bottom: 1rem;
+}
+
+.easy-editor-container .ql-editor a {
+    color: var(--bs-primary);
+    text-decoration: underline;
+}
+
+.easy-editor-container .ql-editor a:hover {
+    color: #0a58ca;
+}
+
+.easy-editor-container .ql-editor blockquote {
+    border-left: 4px solid var(--bs-primary);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--bs-gray);
+    font-style: italic;
+}
+
+.easy-editor-container .ql-editor code,
+.easy-editor-container .ql-editor pre {
+    background: var(--bs-light);
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.easy-editor-container .ql-editor pre {
+    padding: 1rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+}
+
+.easy-editor-container .ql-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.25rem;
+    margin: 1rem 0;
+}
+
+.easy-editor-container .ql-editor video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.25rem;
+    margin: 1rem 0;
+}
+
+/* Table Styling */
+.easy-editor-container .ql-editor table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.easy-editor-container .ql-editor table td,
+.easy-editor-container .ql-editor table th {
+    border: 1px solid #ced4da;
+    padding: 0.5rem;
+}
+
+.easy-editor-container .ql-editor table th {
+    background: var(--bs-light);
+    font-weight: 600;
+}
+
+/* List Styling */
+.easy-editor-container .ql-editor ul,
+.easy-editor-container .ql-editor ol {
+    padding-left: 2rem;
+    margin: 1rem 0;
+}
+
+.easy-editor-container .ql-editor li {
+    margin: 0.25rem 0;
+}
+
+/* Focus State */
+.easy-editor-container.ql-container.ql-snow:focus-within {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Error State */
+.easy-editor-container.has-error {
+    border-color: var(--bs-danger);
+}
+
+.easy-editor-container.has-error .ql-toolbar {
+    border-bottom-color: var(--bs-danger);
+}
+
+/* Success State */
+.easy-editor-container.has-success {
+    border-color: var(--bs-success);
+}
+
+/* Disabled State */
+.easy-editor-container.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.easy-editor-container.disabled .ql-toolbar {
+    background: var(--bs-light);
+}
+
+.easy-editor-container.disabled .ql-editor {
+    background: var(--bs-light);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .easy-editor-container .ql-toolbar {
+        padding: 0.25rem;
+    }
+    
+    .easy-editor-container .ql-toolbar button {
+        padding: 0.25rem;
+        margin: 0.0625rem;
+    }
+    
+    .easy-editor-container .ql-editor {
+        min-height: 300px;
+        padding: 0.5rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .easy-editor-container .ql-toolbar {
+        display: none;
+    }
+    
+    .easy-editor-container {
+        border: none;
+    }
+}

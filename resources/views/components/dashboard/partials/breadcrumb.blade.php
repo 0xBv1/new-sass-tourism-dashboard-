@@ -1,0 +1,21 @@
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="page-header-left">
+                    <h3>{{ $title }} <small>{{ config('app.name') }} Admin panel</small></h3>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <ol class="breadcrumb pull-right">
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('dashboard') }}">
+                            <i data-feather="home"></i>
+                        </a>
+                    </li>
+                    {{ $slot }}
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
