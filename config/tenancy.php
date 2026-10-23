@@ -32,7 +32,7 @@ return [
     'database' => [
         'central_connection' => 'central',
         'template_tenant_connection' => 'mysql',
-        'prefix' => 'tenant_',
+        'prefix' => env('TENANCY_DB_PREFIX', 'tenant_'),
         'suffix' => '',
         'managers' => [
             'sqlite' => Stancl\Tenancy\TenantDatabaseManagers\SQLiteDatabaseManager::class,

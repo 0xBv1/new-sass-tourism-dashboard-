@@ -232,7 +232,17 @@ class CompanyProvisioner
             return;
         }
 
-        app()->call([new CreateDatabase($tenant), 'handle']);
+        try {
+            app()->call([new CreateDatabase($tenant), 'handle']);
+        } catch (Throwable $exception) {
+            if (! str_contains($exception->getMessage(), '1044') && ! str_contains($exception->getMessage(), 'Access denied')) {
+                throw $exception;
+            }
+
+            throw new RuntimeException(
+                'الاستضافة لا تسمح بإنشاء قاعدة '.$tenant->databaseName().' تلقائياً. من MySQL Databases أنشئها وأضف المستخدم بصلاحية All Privileges، ثم أعد المحاولة.'
+            );
+        }
     }
 
     protected function migrateBatch(Tenant $tenant): void
