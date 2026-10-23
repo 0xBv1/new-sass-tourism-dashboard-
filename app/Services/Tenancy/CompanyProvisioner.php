@@ -228,6 +228,13 @@ class CompanyProvisioner
 
     protected function createDatabase(Tenant $tenant): void
     {
+        $expected = config('tenancy.database.prefix').$tenant->getTenantKey().config('tenancy.database.suffix');
+
+        if ($tenant->databaseName() !== $expected) {
+            $tenant->setInternal('db_name', $expected);
+            $tenant->save();
+        }
+
         if ($this->databaseExists($tenant)) {
             return;
         }
